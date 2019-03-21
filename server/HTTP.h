@@ -4,6 +4,9 @@
 #ifndef HASH_MAP_H_INCLUDED
 #include "hash_map.h"
 #endif // HASH_MAP_H_INCLUDED
+#ifndef G_DEFINES_H_INCLUDED
+#include "g_defines.h"
+#endif // G_DEFINES_H_INCLUDED
 
 #include <stdio.h>
 #include <stdlib.h>

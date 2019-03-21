@@ -5,6 +5,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifndef G_DEFINES_H_INCLUDED
+#include "g_defines.h"
+#endif // G_DEFINES_H_INCLUDED
+
 typedef void* T;
 typedef void(*callback)(T);
 typedef unsigned int u_int;

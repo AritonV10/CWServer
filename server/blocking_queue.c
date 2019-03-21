@@ -1,72 +1,101 @@
 #include "blocking_queue.h"
 
 
-static inline void make_node(void *, QNOde *);
+__SINLINE struct QNode * make_node(void *);
 
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-int put(Queue * queue, void * data) {
-    pthread_mutex_lock(&queue->lock);
-    struct QNode * first = queue->first;
-    struct QNode * new_;
-    if(first != NULL) {
-        while(first != NULL) {
-            first = first->next;
+
+BlockingQueue * make_queue() {
+    BlockingQueue * queue;
+    if((queue = malloc(sizeof(BlockingQueue)))){
+        if((pthread_mutex_init(&queue->lock, NULL)) == 0) {
+            if((pthread_cond_init(&queue->condition, NULL)) == 0) {
+                queue->first = NULL;
+                queue->state_ = STATE_EMPTY;
+                queue->nodes = 0;
+                return queue;
+            }
         }
-        make_node(data, &new_);
-    } else {
-        make_node(data, &new_);
     }
-    if(new_ != NULL) {
-        first = new_;
-    } else {
-        return 1;
+    // to do: exit the program and update the logs
+    pthread_mutex_destroy(&queue->lock);
+    pthread_cond_destroy(&queue->condition);
+    free(queue);
+    return NULL;
+}
+
+int queue_put(BlockingQueue * queue, void * data) {
+
+    pthread_mutex_lock(&queue->lock);
+    struct QNode * node = queue->first;
+
+    while(node != NULL)
+        node = node->next;
+
+    node = make_node(data);
+
+    if(node == NULL) {
         pthread_mutex_unlock(&queue->lock);
+        // warn that there is not enough memory
+        return 1;
     }
+
+    queue->state_ = STATE_NOT_EMPTY;
+    queue->nodes += 1;
+
     pthread_mutex_unlock(&queue->lock);
+    pthread_cond_signal(&queue->condition);
     return 0;
 }
 
-void * pop(Queue * queue) {
+void * queue_pop(BlockingQueue * queue) {
+
     pthread_mutex_lock(&queue->lock);
-    while(queue->)
-    struct QNode * first = queue->first;
-    void * data_;
-    if(first->next != NULL) {
-        struct QNode * next = first->next;
-        data_ = first->next->data;
-        queue->first = next;
-    } else {
-        data_ = first->data;
+    while(queue->state_ == STATE_EMPTY) {
+        printf("\nWaiting..\n");
+        pthread_cond_wait(&queue->condition, &queue->lock);
     }
-    first = NULL;
+    struct QNode * first = queue->first;
+    void * data_ = first->data;
+
+    queue->first = queue->first->next;
+
     first->next = NULL;
     free(first);
-    pthread_mutex_lock(&queue->lock);
+    queue->nodes -= 1;
+    if(queue->nodes == 0)
+        queue->state_ = STATE_EMPTY;
+    pthread_mutex_unlock(&queue->lock);
     return data_;
-
 }
 
-void free_queue(Queue * queue) {
-    struct QNode * head;
+void free_queue(BlockingQueue * queue) {
+    struct QNode * head = queue->first;
     while(head != NULL) {
         struct QNode * temp = head;
-        free(temp->data);
-        free(temp);
+        free(head->data);
+        free(head);
         head = head->next;
     }
+    pthread_mutex_destroy(&queue->lock);
+    pthread_cond_destroy(&queue->condition);
     free(queue);
 }
 
+
+
 ////////////////////////////////////////////////
 ////////////////////////////////////////////////
 
-static inline void make_node(void * data_, QNode * new_) {
-    if((*new_ = malloc(sizeof(struct Node)))) {
-        *new_->data;
-    } else {
-        free(node;)
-        *new_ = NULL;
+
+__SINLINE struct QNode * make_node(void * data_) {
+    struct QNode * new_;
+    if((new_ = malloc(sizeof(struct QNode)))) {
+        new_->data = data_;
+        new_->next = NULL;
+        return new_;
     }
+    return NULL;
 }

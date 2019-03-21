@@ -179,7 +179,7 @@ static Map * parse_query_params(
     return NULL;
 }
 
-static inline void append_to_string(
+__SINLINEV append_to_string(
     char * source,
     int * i,
     char * head,
@@ -190,4 +190,7 @@ static inline void append_to_string(
 
     }
     source[*i] = STR_END;
+    #ifdef HTTP_DEBUG
+        printf("__SINLINEV:%s", source);
+    #endif
 }

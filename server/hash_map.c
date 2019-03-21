@@ -4,8 +4,8 @@
 
 ///////////////////////////////////////////
 
-static inline void str_len(const char*, size_t *);
-static inline void compute_hash(const char *, u_int *);
+__SINLINEV str_len(const char*, size_t *);
+__SINLINEV compute_hash(const char *, u_int *);
 static struct Node * _make_node(char*, u_int, struct Node*, T);
 static void rehash(Map*);
 
@@ -212,12 +212,12 @@ int map_merge_data(Map * map, char * key_to_merge, callback function) {
 ///////////////////////////////////////////////////
 
 // compute the length of the key for hashing
-static inline void str_len(const char * string, size_t * __klen) {
+__SINLINEV str_len(const char * string, size_t * __klen) {
     for(*__klen = 0; string[*__klen] != '\0'; *++__klen){}
 }
 
 // todo: inline it and pass the hash to variable
-static inline void compute_hash(const char * key, u_int * hash_) {
+__SINLINEV compute_hash(const char * key, u_int * hash_) {
    u_int hash = 0xAAAAAAAA;
    u_int i;
    u_int __klen;
@@ -245,6 +245,6 @@ static struct Node * _make_node(char * key, u_int hash, struct Node * next, T da
 }
 
 // to do
-static inline void rehash(Map * map) {
+__SINLINEV rehash(Map * map) {
 
 }

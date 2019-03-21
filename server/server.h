@@ -24,7 +24,14 @@
 #define SOCK_OPEN_ERR "There has been an error creating the socket"
 #define DEFAULT_PORT 8080
 #define DEFAULT_NO_THREADS 20
-#define BUFLEN 1 << 9 // 1024
+#define BUFLEN (1 << 11) // 4096
+
+#define P_ERROR(e, message) {\
+            if(e == 0){\
+                perror(message);\
+                exit(1);\
+            }\
+        }
 
 extern Map * APP_MAPPINGS;
 void start_server(Map * mappings, const char * IP, const char * port);

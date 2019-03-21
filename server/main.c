@@ -1,16 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "HTTP.h"
+#include "blocking_queue.h"
 
-
-void * sum(int a, int b) {
-    return a + b;
+void * task1(void * p) {
+    BlockingQueue * q = (BlockingQueue*) p;
+    while(1) {
+        int x = (int)queue_pop(q);
+        printf("%d\n", x);
+    }
+    return NULL;
 }
 
-typedef void(*test)(void *);
-
-void t(test test, void * arg) {
-
+void * task(void * p) {
+    printf("Test");
+    int x = 5;
+    int * c = (int*) p;
+    *c += x;
 }
 
 int main(void) {
@@ -35,7 +40,26 @@ int main(void) {
     printf("%s", map_get_value(h->headers, "Connection"));
     */
 
-    Map * map_ = create_map();
+    BlockingQueue * queue = make_queue();
 
+    queue_put(queue, 1);
+    queue_put(queue, 2);
+    struct QNode * node = queue->first;
+
+    while(node != NULL) {
+        printf("%d", node->data);
+        node = node->next;
+    }
+
+    free_queue(queue);
+
+
+    /*
+    int x = 2;
+    thread_pool * pool = make_thread_pool(1);
+    add_task(pool, &task, &x);
+    sleep(2);
+    printf("%d", x);
+*/
     return 0;
 }
