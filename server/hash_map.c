@@ -16,7 +16,8 @@ static double LOAD_FACTOR = 0.75;
 
 ///////////////////////////////////////////
 
-Map * create_map() {
+Map
+* create_map() {
     Map * map_;
 
     if((map_ = malloc(sizeof(Map)))) {
@@ -26,11 +27,12 @@ Map * create_map() {
             return map_;
         }
     };
-    free_map(map_);
+    free(map_);
     return NULL;
 }
 
-int map_put(Map * map_, char * key, T data) {
+int
+map_put(Map * map_, char * key, T data) {
     // no map passed
     if(!map_)
         return -1;
@@ -42,9 +44,6 @@ int map_put(Map * map_, char * key, T data) {
         return -1;
     u_int __kpos = hash_ % map_->BUCKETS;
 
-    #ifdef DEBUG
-        printf("[Map-Put] Key: %s | Position: %i | Data: %s\n", key, __kpos, data);
-    #endif // DEBUG
     if(((double)map_->BUCKETS * LOAD_FACTOR) == map_->_elements) {
         rehash(map_);
     }
@@ -68,7 +67,8 @@ int map_put(Map * map_, char * key, T data) {
     return 1;
 }
 
-T map_remove_key(Map * map, char * key) {
+T
+map_remove_key(Map * map, char * key) {
     // use a callback
     u_int hash;
     compute_hash(key, &hash);
@@ -104,7 +104,8 @@ T map_remove_key(Map * map, char * key) {
     return NULL;
 }
 
-T map_get_value(Map * map, const char * key) {
+T
+map_get_value(Map * map, const char * key) {
     u_int hash_;
     compute_hash(key, &hash_);
 
@@ -131,7 +132,8 @@ T map_get_value(Map * map, const char * key) {
     return NULL;
 }
 
-void free_map(Map * map) {
+void
+free_map(Map * map) {
     u_int i;
 
     if(!map)
@@ -156,7 +158,8 @@ void free_map(Map * map) {
     free(map);
 }
 
-int map_override_key(Map * map_, char * key_to_overrride, T new_data) {
+int
+map_override_key(Map * map_, char * key_to_overrride, T new_data) {
     if(!map_)
         return -1;
     u_int hash_;
@@ -182,7 +185,8 @@ int map_override_key(Map * map_, char * key_to_overrride, T new_data) {
     return -1;
 }
 
-int map_merge_data(Map * map, char * key_to_merge, callback function) {
+int
+map_merge_data(Map * map, char * key_to_merge, callback function) {
     if(!map)
         return -1;
     u_int hash_;
@@ -212,15 +216,19 @@ int map_merge_data(Map * map, char * key_to_merge, callback function) {
 ///////////////////////////////////////////////////
 
 // compute the length of the key for hashing
-__SINLINEV str_len(const char * string, size_t * __klen) {
-    for(*__klen = 0; string[*__klen] != '\0'; *++__klen){}
+__SINLINEV
+str_len(const char * string, size_t * __klen) {
+    int i;
+    for(i = 0; string[i] != '\0'; ++i){}
+    *__klen = i;
 }
 
 // todo: inline it and pass the hash to variable
-__SINLINEV compute_hash(const char * key, u_int * hash_) {
+__SINLINEV
+compute_hash(const char * key, u_int * hash_) {
    u_int hash = 0xAAAAAAAA;
-   u_int i;
-   u_int __klen;
+   short i;
+   short __klen;
    str_len(key, &__klen);
    for (i = 0; i < __klen; ++key, ++i) {
       hash ^= ((i & 1) == 0) ? (  (hash <<  7) ^ (*key) * (hash >> 3)) :
@@ -232,7 +240,8 @@ __SINLINEV compute_hash(const char * key, u_int * hash_) {
       *hash_ = hash;
 }
 
-static struct Node * _make_node(char * key, u_int hash, struct Node * next, T data) {
+static struct Node *
+_make_node(char * key, u_int hash, struct Node * next, T data) {
     struct Node * node;
     if((node = malloc(sizeof(struct Node)))) {
         node->data = data;
@@ -245,6 +254,7 @@ static struct Node * _make_node(char * key, u_int hash, struct Node * next, T da
 }
 
 // to do
-__SINLINEV rehash(Map * map) {
+__SINLINEV
+rehash(Map * map) {
 
 }

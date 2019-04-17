@@ -11,18 +11,34 @@
 
 typedef void* T;
 typedef void(*callback)(T);
-typedef unsigned int u_int;
+
+/*
 struct Node {
+    enum {
+        NORMAL,
+        MAP
+    } _type;
     T data;
-    struct  Node * next_node;
-    char *  key_;
+    struct node * next_node;
+    union {
+        struct {
+            char *  key;
+            u_int   hash_function;
+        }_map;
+    };
+}
+*/
+struct Node {
     u_int   hash_function;
+    T data;
+    char *  key_;
+    struct  Node * next_node;
 };
 
 typedef struct {
-    struct  Node ** buckets;
     size_t  BUCKETS;
     size_t  _elements;
+    struct  Node ** buckets;
 } Map;
 /** Create a map datastructure **/
 Map * create_map();

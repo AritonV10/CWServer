@@ -3,10 +3,15 @@
 
 #include <pthread.h>
 #include <stdlib.h>
+#include <stdio.h>
 
-#define __SINLINE static inline
+#define __ADDRESS(queue, _elem) &(queue->_elem)
 
-typedef enum { STATE_EMPTY, STATE_NOT_EMPTY } state;;
+#ifndef G_DEFINES_H_INCLUDED
+    #include "g_defines.h"
+#endif // G_DEFINES_H_INCLUDED
+
+
 
 struct QNode {
     void * data;
@@ -14,17 +19,17 @@ struct QNode {
 };
 
 typedef struct {
+    u_int _state     : 1;
+    u_int _th_signal : 1;
+    u_int nodes;
     struct QNode * first;
     pthread_mutex_t lock;
     pthread_cond_t condition;
-    state state_;
-    int nodes;
 } BlockingQueue;
 
-BlockingQueue * msake_queue();
-void * queue_pop(BlockingQueue *);
-int queue_put(BlockingQueue *, void *);
+BlockingQueue * make_queue();
+void * queue_pop(BlockingQueue * __restrict);
+int queue_put(BlockingQueue * __restrict, void *);
 void free_queue(BlockingQueue *);
-
 
 #endif // BLOCKING_QUEUE_H_INCLUDED

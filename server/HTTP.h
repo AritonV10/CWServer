@@ -16,14 +16,17 @@
 #define Q_TOKEN '?'
 #define EQ_TOKEN '='
 #define STR_END '\0'
-#define HTTP_END "\r\n\r\n"
+#define HTTP_END "\r\n\r\n\0"
+
+
 
 typedef enum {
-    HTML,
-    JSON,
-    XML,
-    HTMLX
-} ContentType;
+  OK,
+  NOT_FOUND,
+  BAD_REQUEST,
+  FORBIDDEN,
+  UNAUTHORIZED
+} ResponseStatus;
 
 typedef enum {
     GET,
@@ -41,20 +44,17 @@ typedef struct {
     char * absolute_path;
     Map  * query_params;
     Map  * headers;
-} RequestHeader;
-
-typedef struct {
-    RequestHeader * header;
 } HTTPRequest;
 
 typedef void *(*mapping_function)(HTTPRequest *, HTTPResponse *);
+Map * APP_MAPPINGS;
 
 typedef struct {
-    mapping_function _func;
     RequestType     rq_type;
+    mapping_function _func;
 } Mapping;
 
-RequestHeader * parse_header(const char *);
-int free_header(RequestHeader *);
-
+HTTPRequest * parse_header(const char *);
+int free_header(HTTPRequest *);
+void add_mapping(char * __restrict, Mapping *);
 #endif // HTTP_H_INCLUDED

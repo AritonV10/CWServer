@@ -21,6 +21,7 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 
+
 #define SOCK_OPEN_ERR "There has been an error creating the socket"
 #define DEFAULT_PORT 8080
 #define DEFAULT_NO_THREADS 20
@@ -33,8 +34,16 @@
             }\
         }
 
-extern Map * APP_MAPPINGS;
-void start_server(Map * mappings, const char * IP, const char * port);
+
+// todo: try with files
+
+typedef struct {
+    u_int value : 1;
+} byte;
+
+
+
+void start_server(const char * IP, const char * port);
 
 
 #endif // SERVER_H_INCLUDED

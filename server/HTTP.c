@@ -5,20 +5,21 @@
 static char * alloc_string(char **, char *, size_t *);
 static Map * parse_query_params(char **, char *, size_t *);
 static void append_to_string(char *, int *, char *, char *);
-static void parse_absolute_path(const char *, RequestHeader * , char *, char *);
+static void parse_absolute_path(const char *, HTTPRequest * , char *, char *);
 
 ////////////////////////////////////
 
-RequestHeader * parse_header(
+HTTPRequest *
+parse_header(
     const char * request_msg) {
 
     char * head     = request_msg;
     char * tail     = request_msg;
     int query_flag  = 1;
     size_t ch_len   = 0;
-    RequestHeader * req_info;
+    HTTPRequest * req_info;
     // get the request type
-    if((req_info = malloc(sizeof(RequestHeader)))) {
+    if((req_info = malloc(sizeof(HTTPRequest)))) {
 
         // get the request type
         while(*tail != ' '){ ++tail; }
@@ -92,7 +93,8 @@ RequestHeader * parse_header(
     return NULL;
 }
 
-int free_header(RequestHeader * header) {
+int
+free_header(HTTPRequest * header) {
 
     if(!header)
         return -1;
@@ -104,10 +106,18 @@ int free_header(RequestHeader * header) {
     free(header);
 }
 
+void
+add_mapping(char * __restrict _path, Mapping * _mappings) {
+    if(APP_MAPPINGS == NULL)
+        APP_MAPPINGS = create_map();
+    map_put(APP_MAPPINGS, _path, (void*) _mappings);
+}
+
 ///////////////////////////////////////////////
 ///////////////////////////////////////////////
 
-static char * alloc_string(
+static char *
+alloc_string(
     char ** head,
     char * tail,
     size_t * ch_len) {
@@ -130,16 +140,13 @@ static char * alloc_string(
     return NULL;
 }
 
-static Map * parse_query_params(
+static Map *
+parse_query_params(
     char ** head,
     char * nav_pointer,
     size_t * ch_len) {
 
     Map     * query_params  = create_map();
-    int     i;
-    size_t  s;
-    (void)  ch_len;
-    (void)  i;
     if(query_params != NULL) {
 
         if(*nav_pointer == Q_TOKEN) {
@@ -151,14 +158,14 @@ static Map * parse_query_params(
                 if(*(nav_pointer) == EQ_TOKEN) {
 
                     ++*head;
-                    char * query = alloc_string(&*head, nav_pointer, &s);
+                    char * query = alloc_string(&*head, nav_pointer, &ch_len);
                     *head = nav_pointer;
 
                     for(;;++nav_pointer) {
 
                         if(*nav_pointer == '&' || *nav_pointer == ' ') {
                             ++*head;
-                            char * query_value = alloc_string(&*head, nav_pointer, &s);
+                            char * query_value = alloc_string(&*head, nav_pointer, &ch_len);
 
                             #ifdef HTTP_DEBUG
                                 printf("[Query-Params] %s = %s\n", query, query_value);
@@ -174,12 +181,15 @@ static Map * parse_query_params(
                 ++nav_pointer;
             }
         }
+
         return query_params;
     }
+
     return NULL;
 }
 
-__SINLINEV append_to_string(
+__SINLINEV
+append_to_string(
     char * source,
     int * i,
     char * head,
